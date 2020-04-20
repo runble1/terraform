@@ -1,57 +1,20 @@
 # ====================
 #
-# AMI
-#
-# ====================
-# 最新版のAmazonLinux2のAMI情報
-data "aws_ami" "myAMI" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "block-device-mapping.volume-type"
-    values = ["gp2"]
-  }
-
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-}
-
-# ====================
-#
 # EC2 Instance
 #
 # ====================
+data aws_ssm_parameter amzn2_ami {
+  name = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+}
+
 resource "aws_instance" "myEC2" {
-  ami                    = data.aws_ami.myAMI.image_id
+  ami                    = data.aws_ssm_parameter.amzn2_ami.value
   vpc_security_group_ids = [aws_security_group.mySecurityGroup.id]
   subnet_id              = aws_subnet.mySubnet.id
   key_name               = aws_key_pair.myKeyPair.id
   instance_type          = "t2.micro"
   tags = {
-    Name = "myEC2"
+    Name = "${terraform.workspace}-myEC2"
   }
 }
 

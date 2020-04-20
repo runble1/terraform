@@ -1,0 +1,6 @@
+**/.terraform/*
+.python-version
+myKeyPair
+myKeyPair.pub
+*.tfstate
+*.tfstate.*

@@ -8,7 +8,7 @@ resource "aws_vpc" "myVPC" {
   enable_dns_support   = "true"
   enable_dns_hostnames = "true"
   tags = {
-    Name = "myVPC"
+    Name = "${terraform.workspace}-vpc"
   }
 }
 
@@ -24,7 +24,7 @@ resource "aws_subnet" "mySubnet" {
   # trueにするとインスタンスにパブリックIPアドレスを自動的に割り当ててくれる
   map_public_ip_on_launch = true
   tags = {
-    Name = "mySubnet"
+    Name = "${terraform.workspace}-subnet"
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_subnet" "mySubnet" {
 resource "aws_internet_gateway" "myGW" {
   vpc_id = aws_vpc.myVPC.id
   tags = {
-    Name = "myGW"
+    Name = "${terraform.workspace}-gateway"
   }
 }
 
@@ -48,7 +48,7 @@ resource "aws_internet_gateway" "myGW" {
 resource "aws_route_table" "myRouteTable" {
   vpc_id = aws_vpc.myVPC.id
   tags = {
-    Name = "myRouteTable"
+    Name = "${terraform.workspace}-routetable"
   }
 }
 resource "aws_route" "myRoute" {
@@ -71,7 +71,7 @@ resource "aws_security_group" "mySecurityGroup" {
   vpc_id = aws_vpc.myVPC.id
   name   = "mySecurityGroup"
   tags = {
-    Name = "mySecurityGroup"
+    Name = "${terraform.workspace}-securitygroup"
   }
 }
 # インバウンドルール(ssh接続用)
@@ -92,16 +92,6 @@ resource "aws_security_group_rule" "in_icmp" {
   from_port         = -1
   to_port           = -1
   protocol          = "icmp"
-}
-
-# インバウンドルール(proxy用)
-resource "aws_security_group_rule" "in_proxy" {
-  security_group_id = aws_security_group.mySecurityGroup.id
-  type              = "ingress"
-  cidr_blocks       = ["0.0.0.0/0"]
-  from_port         = 3128
-  to_port           = 3128
-  protocol          = "tcp"
 }
 
 # アウトバウンドルール(全開放)
